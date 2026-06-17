@@ -16,7 +16,7 @@ st.set_page_config(
     layout="wide"
 )
 
-FASES_ORDEM = ["Oitavas de Final", "Quartas de Final", "Semifinal", "Disputa de 3º Lugar", "Final"]
+FASES_ORDEM = ["16 avos de final", "Oitavas de Final", "Quartas de Final", "Semifinal", "Disputa de 3º Lugar", "Final"]
 
 # =====================================================
 # INICIALIZAÇÃO DO ESTADO DA SESSÃO
