@@ -16,7 +16,7 @@ st.set_page_config(
     layout="wide"
 )
 
-FASES_ORDEM = ["16 avos de final", "Oitavas de Final", "Quartas de Final", "Semifinal", "Disputa de 3º Lugar", "Final"]
+FASES_ORDEM = ["Oitavas de Final", "Quartas de Final", "Semifinal", "Disputa de 3º Lugar", "Final"]
 
 # =====================================================
 # INICIALIZAÇÃO DO ESTADO DA SESSÃO
@@ -670,10 +670,16 @@ if db is not None:
                     fase_idx = FASES_ORDEM.index(cf_edicao["fase"]) if cf_edicao["fase"] in FASES_ORDEM else 0
                     fase_edit = st.selectbox("Fase:", FASES_ORDEM, index=fase_idx, key=f"fase_edit_{id_confronto_edicao}")
                 with col_data_e:
-                    data_atual = pd.to_datetime(cf_edicao["data_hora"]).date() if pd.notna(cf_edicao["data_hora"]) else datetime.now().date()
+                    # Converte de volta para Brasília (UTC-3) antes de exibir no form
+                    if pd.notna(cf_edicao["data_hora"]):
+                        dt_brasilia = pd.to_datetime(cf_edicao["data_hora"]) - timedelta(hours=3)
+                        data_atual = dt_brasilia.date()
+                        hora_atual = dt_brasilia.time()
+                    else:
+                        data_atual = datetime.now().date()
+                        hora_atual = datetime.now().time()
                     data_edit = st.date_input("Data do jogo:", value=data_atual, key=f"data_edit_{id_confronto_edicao}")
                 with col_hora_e:
-                    hora_atual = pd.to_datetime(cf_edicao["data_hora"]).time() if pd.notna(cf_edicao["data_hora"]) else datetime.now().time()
                     hora_edit = st.time_input("Hora do jogo:", value=hora_atual, key=f"hora_edit_{id_confronto_edicao}")
 
                 col_casa_e, col_cod_casa_e, col_fora_e, col_cod_fora_e = st.columns(4)
