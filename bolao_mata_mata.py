@@ -16,7 +16,7 @@ st.set_page_config(
     layout="wide"
 )
 
-FASES_ORDEM = ["Oitavas de Final", "Quartas de Final", "Semifinal", "Disputa de 3º Lugar", "Final"]
+FASES_ORDEM = ["16 avos de final", "Oitavas de Final", "Quartas de Final", "Semifinal", "Disputa de 3º Lugar", "Final"]
 
 # =====================================================
 # INICIALIZAÇÃO DO ESTADO DA SESSÃO
@@ -508,12 +508,10 @@ if db is not None:
                     if key_salvo not in st.session_state:
                         st.session_state[key_salvo] = False
 
-                    # Exibe no horário de Brasília (UTC-3)
+                    # Mostra o horário do jogo, se cadastrado
                     if pd.notna(cf["data_hora"]):
-                        horario_brasilia = pd.to_datetime(cf["data_hora"]) - timedelta(hours=3)
-                        horario_fmt = horario_brasilia.strftime("%d/%m/%Y %H:%M")
-                        fechamento_fmt = (horario_brasilia - timedelta(hours=1)).strftime("%d/%m %H:%M")
-                        st.caption(f"🗓️ {horario_fmt}  •  Fecha às {fechamento_fmt} (horário de Brasília)")
+                        horario_fmt = pd.to_datetime(cf["data_hora"]).strftime("%d/%m/%Y %H:%M")
+                        st.caption(f"🗓️ {horario_fmt}  •  Fecha às {(pd.to_datetime(cf['data_hora']) - timedelta(hours=1)).strftime('%d/%m %H:%M')}")
                     else:
                         st.caption("🗓️ Horário a definir pelo administrador")
 
@@ -643,9 +641,7 @@ if db is not None:
                 if not casa_novo or not fora_novo or not cod_casa_novo or not cod_fora_novo:
                     st.error("Preencha todos os campos antes de cadastrar.")
                 else:
-                    # Compensa o fuso UTC-3 (Brasília): o Streamlit Cloud roda em UTC,
-                    # então somamos 3h para que "16:00 de Brasília" seja salvo como 19:00 UTC
-                    data_hora_novo = datetime.combine(data_novo, hora_novo) + timedelta(hours=3)
+                    data_hora_novo = datetime.combine(data_novo, hora_novo)
                     novo_id = proximo_id_confronto()
                     if salvar_confronto_mongo(novo_id, fase_novo, casa_novo.strip(), cod_casa_novo, fora_novo.strip(), cod_fora_novo, data_hora_novo):
                         st.success(f"Confronto '{casa_novo} x {fora_novo}' cadastrado na fase {fase_novo}!")
@@ -693,8 +689,7 @@ if db is not None:
                     excluir_edicao = st.form_submit_button("🗑️ Excluir Confronto", use_container_width=True)
 
                 if salvar_edicao:
-                    # Compensa o fuso UTC-3 (Brasília)
-                    data_hora_edit = datetime.combine(data_edit, hora_edit) + timedelta(hours=3)
+                    data_hora_edit = datetime.combine(data_edit, hora_edit)
                     if salvar_confronto_mongo(id_confronto_edicao, fase_edit, casa_edit.strip(), cod_casa_edit, fora_edit.strip(), cod_fora_edit, data_hora_edit):
                         st.success("Confronto atualizado!")
                         st.rerun()
